@@ -1,0 +1,67 @@
+// ==UserScript==
+// @name         添加WhatsApp按钮在店小秘订单页面
+// @namespace    http://tampermonkey-test
+// @version      1
+// @description  Add a WhatsApp button on the dianxiaomi order page to easily contact the customer with their phone number provided on the page.
+// @author       Your name
+// @match        https://www.dianxiaomi.com/order/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.target.classList.contains("modal-backdrop") && mutation.target.classList.contains("in")) {
+        addWhatsAppButton();
+      }
+    });
+  });
+
+  // 开始监测
+  observer.observe(document.body, {attributes: true, childList: true, subtree: true});
+
+  function addWhatsAppButton() {
+    // 查询.iconfont.icon_eye是否存在，如果存在点击
+    const iconEye = document.querySelector('.iconfont.icon_eye');
+    if (iconEye) {
+      iconEye.click();
+
+      // 循环检测#detailMobile1的值，只要不包含“*”符号，就构建 WhatsApp 链接和按钮
+      const checkMobileNumber = setInterval(function() {
+        const mobileElement = document.querySelector('#detailMobile1');
+        const mobileNumber = mobileElement.textContent.trim().replace(/[^*\d]/g, '').replace(/[\s\-+]/g, '');
+
+
+
+        console.log(mobileNumber); // 输出 +351 91762125
+
+        if (!mobileNumber.includes('*')) {
+          clearInterval(checkMobileNumber);
+
+  // 如果 WhatsApp 按钮已存在，则不再创建
+            const existingButton = document.querySelector("#whatsapp-button");
+if (existingButton) {
+
+  return;
+}
+
+          // 构建 WhatsApp 链接和按钮
+          const whatsappLink = `https://web.whatsapp.com/send?phone=${mobileNumber}`;
+          const linkElement = document.createElement("a");
+          linkElement.href = whatsappLink;
+          linkElement.target = "_blank";
+          linkElement.textContent = "通过WhatsApp联系客户";
+          linkElement.style = "display: block;width: 100%;height: 34px;line-height: 33px;text-align: center;background-color: rgb(52 130 4);color: rgb(255, 255, 255);/* font-size: 12px; */border-radius: 4px;text-decoration: none;/* margin-top: 10px; */float: right;margin-left: 10px;margin-top: 10px;";
+          linkElement.id = "whatsapp-button";
+
+          // 将 WhatsApp 按钮添加到页面中
+          const detailInfo = document.querySelector(".order-detail-con");
+
+          detailInfo.appendChild(linkElement);
+        }
+      }, 100);
+    }
+  }
+})();
