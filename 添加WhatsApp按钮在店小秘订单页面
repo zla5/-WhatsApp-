@@ -31,6 +31,7 @@
       // 循环检测#detailMobile1的值，只要不包含“*”符号，就构建 WhatsApp 链接和按钮
       const checkMobileNumber = setInterval(function() {
         const mobileElement = document.querySelector('#detailMobile1');
+         // 删除其中的空格和“-"及“+”符号但又要排除非"*"符号
         const mobileNumber = mobileElement.textContent.trim().replace(/[^*\d]/g, '').replace(/[\s\-+]/g, '');
 
 
